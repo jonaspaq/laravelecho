@@ -14,8 +14,8 @@
             <tr>
                 <th scope="row">{{order.id}}</th>
                 <td>{{order.order_name}}</td>
-                <td v-if="!order.order_shipped">Pending </td>
-                <td v-if="order.order_shipped"> Shipped </td>
+                <td v-if="!order.order_shipped">Pending</td>
+                <td v-if="order.order_shipped">Shipped</td>
                 <td>{{order.created_at}}</td>
                 <td><button type="button" class="btn btn-light" @click="updateStatus(order.id)">Update</button></td>
             </tr>
