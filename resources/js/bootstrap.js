@@ -34,20 +34,9 @@ import Echo from 'laravel-echo';
 window.Pusher = require('pusher-js');
 
 window.Echo = new Echo({
+    authEndpoint: "../broadcasting/auth",
     broadcaster: 'pusher',
     key: process.env.MIX_PUSHER_APP_KEY,
     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-    encrypted: true
+    encrypted: true,
 });
-
-// var pusher = new Pusher(process.env.MIX_PUSHER_APP_KEY, {
-//     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-//     forceTLS: true
-// });
-// pusher.logToConsole = true;
-
-// var channel = pusher.subscribe('orders');
-
-// channel.bind('OrderShipped', function(data) {
-//   alert(JSON.stringify(data));
-// });

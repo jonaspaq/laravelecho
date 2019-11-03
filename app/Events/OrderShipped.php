@@ -35,8 +35,8 @@ class OrderShipped implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        // return new PrivateChannel('orders');
-        return new Channel('orders');
+        return new PrivateChannel('order.'.$this->order->id);
+        // return new Channel('orders');
     }
     
 }

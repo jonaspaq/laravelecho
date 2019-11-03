@@ -43,15 +43,15 @@ export default {
             axios.get('/api/fetchOrder')
             .then( response => {
                 this.order = response.data
+                
+                window.Echo.private(`order.${this.order.id}`)
+                .listen('OrderShipped', (e) => {
+                    console.log(e);
+                });
             })
             .catch( err => {
                 console.log(err)
             })
-
-            window.Echo.channel('orders')
-                .listen('OrderShipped', (e) => {
-                    console.log(e);
-                });
         },
         updateStatus(id){
             axios({
@@ -59,7 +59,7 @@ export default {
                 method: 'PATCH'
             })
             .then(response => {
-                console.log(response.data)
+                // console.log(response.data)
                 this.order.order_shipped = response.data.order_shipped
             })
             .catch( err => {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Order;
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels
@@ -16,5 +17,9 @@ Broadcast::channel('App.User.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('orders', function($user, $order){
+    return true;
+});
+
+Broadcast::channel('order.{orderId}', function ($user, $orderId) {
     return true;
 });
