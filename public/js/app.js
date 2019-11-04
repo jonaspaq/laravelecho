@@ -1861,19 +1861,51 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'ChatBox',
-  created: function created() {
-    this.fetchMessages();
-  },
+  props: ['userid'],
   data: function data() {
     return {
-      posts: ''
+      channelId: 1,
+      messages: [],
+      inputMessage: ''
     };
   },
+  created: function created() {
+    this.fetchMessages();
+    console.log(this.userid);
+  },
   methods: {
-    fetchMessages: function fetchMessages() {}
+    fetchMessages: function fetchMessages() {
+      var _this = this;
+
+      var self = this;
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/getchannelmessages/' + this.channelId).then(function (response) {
+        _this.messages = response.data;
+      });
+      window.Echo.channel('public').listen('NewMessage', function (e) {
+        self.messages.push(e.message);
+      });
+    },
+    sendMessage: function sendMessage() {
+      var holder = {
+        user_id: this.userid,
+        message_channel_id: this.channelId,
+        message: this.inputMessage
+      };
+      this.messages.push(holder);
+      this.inputMessage = '';
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/sendmessage', holder).then(function (response) {});
+    }
   }
 });
 
@@ -8380,7 +8412,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".chatContainer[data-v-5142db38] {\n  position: relative;\n  width: 500px;\n  height: 80vh;\n  border-radius: 3px;\n}\n.chatHeader[data-v-5142db38] {\n  padding: 15px;\n  background: -webkit-gradient(linear, left top, left bottom, from(#ff4b1f), to(#ff9068));\n  background: linear-gradient(#ff4b1f, #ff9068);\n  color: white;\n}\n.chatHeader img[data-v-5142db38] {\n  width: 40px;\n  height: 40px;\n}\n.chatHeader h3[data-v-5142db38] {\n  margin: 0;\n  padding: 0;\n}\n.chatBody[data-v-5142db38] {\n  overflow-y: auto;\n  width: 100%;\n  height: 80%;\n}\n.chatInput[data-v-5142db38] {\n  display: -webkit-box;\n  display: flex;\n}\n.chatInput button[data-v-5142db38] {\n  color: white;\n  background: -webkit-gradient(linear, left top, left bottom, from(#ff4b1f), to(#ff9068));\n  background: linear-gradient(#ff4b1f, #ff9068);\n}", ""]);
+exports.push([module.i, ".chatContainer[data-v-5142db38] {\n  width: 500px;\n  height: 80vh;\n  border-radius: 3px;\n}\n.chatHeader[data-v-5142db38] {\n  padding: 15px;\n  background: -webkit-gradient(linear, left top, left bottom, from(#ff4b1f), to(#ff9068));\n  background: linear-gradient(#ff4b1f, #ff9068);\n  color: white;\n}\n.chatHeader img[data-v-5142db38] {\n  width: 40px;\n  height: 40px;\n}\n.chatHeader h3[data-v-5142db38] {\n  margin: 0;\n  padding: 0;\n}\n.chatBody[data-v-5142db38] {\n  overflow-y: auto;\n  width: 100%;\n  height: 80%;\n}\n.sender[data-v-5142db38] {\n  display: -webkit-box;\n  display: flex;\n  padding: 0 8px;\n}\n.senderText[data-v-5142db38] {\n  background: #EAE8E8;\n  border: 1px solid #e4e4e4;\n  margin: 0 !important;\n  margin-top: 8px;\n  border-radius: 9px;\n  padding: 7px 10px;\n  max-width: 400px;\n}\n.reciever[data-v-5142db38] {\n  display: -webkit-box;\n  display: flex;\n  padding: 0 8px;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: reverse;\n          flex-direction: row-reverse;\n}\n.recieverText[data-v-5142db38] {\n  color: white;\n  background: #EE6544;\n  border: 1px solid #e4e4e4;\n  margin: 0 !important;\n  margin-top: 8px;\n  border-radius: 9px;\n  padding: 7px 10px;\n  max-width: 400px;\n}\n.messageOwner[data-v-5142db38] {\n  display: block;\n}\n.chatInput[data-v-5142db38] {\n  display: -webkit-box;\n  display: flex;\n}\n.chatInput button[data-v-5142db38] {\n  color: white;\n  background: -webkit-gradient(linear, left top, left bottom, from(#ff4b1f), to(#ff9068));\n  background: linear-gradient(#ff4b1f, #ff9068);\n}", ""]);
 
 // exports
 
@@ -47749,10 +47781,35 @@ var render = function() {
     _vm._v(" "),
     _c(
       "div",
-      { staticClass: "chatBody border-left border-right" },
-      _vm._l(_vm.posts, function(post) {
-        return _c("div", { key: post.id }, [
-          _c("p", [_vm._v(_vm._s(post.title))])
+      { staticClass: "chatBody border-left border-right py-2" },
+      _vm._l(_vm.messages, function(message) {
+        return _c("div", { key: message.id }, [
+          _c(
+            "div",
+            {
+              staticClass: "pt-3",
+              class: [_vm.userid != message.user_id ? "sender" : "reciever"]
+            },
+            [
+              _c(
+                "p",
+                {
+                  class: [
+                    _vm.userid != message.user_id
+                      ? "senderText"
+                      : "recieverText"
+                  ]
+                },
+                [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(message.message) +
+                      " \n                "
+                  )
+                ]
+              )
+            ]
+          )
         ])
       }),
       0
@@ -47764,10 +47821,43 @@ var render = function() {
         on: {
           submit: function($event) {
             $event.preventDefault()
+            return _vm.sendMessage()
           }
         }
       },
-      [_vm._m(1)]
+      [
+        _c("div", { staticClass: "chatInput" }, [
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.inputMessage,
+                expression: "inputMessage"
+              }
+            ],
+            staticClass: "form-control",
+            attrs: {
+              type: "text",
+              placeholder: "Message here. . .",
+              required: ""
+            },
+            domProps: { value: _vm.inputMessage },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.inputMessage = $event.target.value
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("button", { staticClass: "btn", attrs: { type: "submit" } }, [
+            _vm._v("Send")
+          ])
+        ])
+      ]
     )
   ])
 }
@@ -47780,21 +47870,6 @@ var staticRenderFns = [
       _c("h3", [
         _c("img", { attrs: { src: "/images/Octocat.png" } }),
         _vm._v(" Chat room for everyone")
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "chatInput" }, [
-      _c("input", {
-        staticClass: "form-control",
-        attrs: { type: "text", name: "", id: "", required: "" }
-      }),
-      _vm._v(" "),
-      _c("button", { staticClass: "btn", attrs: { type: "submit" } }, [
-        _vm._v("Send")
       ])
     ])
   }
@@ -60031,7 +60106,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _bootstrap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 /* harmony import */ var _components_ExampleComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/ExampleComponent */ "./resources/js/components/ExampleComponent.vue");
-/* harmony import */ var _components_ChatBox__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/ChatBox */ "./resources/js/components/ChatBox.vue");
+/* harmony import */ var _components_ChatBox__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/ChatBox */ "./resources/js/components/ChatBox.vue");
 
 
 
@@ -60040,7 +60115,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
   el: '#app',
   components: {
     ExampleComponent: _components_ExampleComponent__WEBPACK_IMPORTED_MODULE_2__["default"],
-    ChatBox: _components_ChatBox__WEBPACK_IMPORTED_MODULE_4__["default"]
+    ChatBox: _components_ChatBox__WEBPACK_IMPORTED_MODULE_3__["default"]
   }
 });
 
@@ -60270,8 +60345,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\Users\Paquibot\Desktop\junjayfolder\myprojects\laravelecho\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\Users\Paquibot\Desktop\junjayfolder\myprojects\laravelecho\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\Users\Nexseed\Desktop\PersonalFolder\laravelecho\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\Users\Nexseed\Desktop\PersonalFolder\laravelecho\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

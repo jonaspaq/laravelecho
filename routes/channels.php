@@ -23,3 +23,7 @@ Broadcast::channel('orders', function($user, $order){
 Broadcast::channel('order.{orderId}', function ($user, $orderId) {
     return true;
 });
+
+Broadcast::channel('public', function($user, $message){
+    return true;
+});
