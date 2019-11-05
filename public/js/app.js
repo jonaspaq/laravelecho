@@ -1872,7 +1872,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'ChatBox',
-  props: ['userid'],
+  props: ['authuser'],
   data: function data() {
     return {
       channelId: 1,
@@ -1882,7 +1882,6 @@ __webpack_require__.r(__webpack_exports__);
   },
   created: function created() {
     this.fetchMessages();
-    console.log(this.userid);
   },
   methods: {
     fetchMessages: function fetchMessages() {
@@ -1891,20 +1890,33 @@ __webpack_require__.r(__webpack_exports__);
       var self = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/getchannelmessages/' + this.channelId).then(function (response) {
         _this.messages = response.data;
+      })["finally"](function (e) {
+        _this.$refs.chatBody.scrollTop = _this.$refs.chatBody.scrollHeight;
       });
       window.Echo.channel('public').listen('NewMessage', function (e) {
-        self.messages.push(e.message);
+        self.messages.push(e.message); // Scroll down chat body when recieving new message
+
+        setTimeout(function (e) {
+          _this.$refs.chatBody.scrollTop = _this.$refs.chatBody.scrollHeight;
+        }, 1);
       });
     },
     sendMessage: function sendMessage() {
+      var _this2 = this;
+
       var holder = {
-        user_id: this.userid,
+        user: this.authuser,
+        user_id: this.authuser.id,
         message_channel_id: this.channelId,
         message: this.inputMessage
       };
       this.messages.push(holder);
-      this.inputMessage = '';
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/sendmessage', holder).then(function (response) {});
+      this.inputMessage = ''; // Scroll down chat body when sending new message
+
+      setTimeout(function (e) {
+        _this2.$refs.chatBody.scrollTop = _this2.$refs.chatBody.scrollHeight;
+      }, 1);
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/sendmessage', holder);
     }
   }
 });
@@ -47781,26 +47793,34 @@ var render = function() {
     _vm._v(" "),
     _c(
       "div",
-      { staticClass: "chatBody border-left border-right py-2" },
+      {
+        ref: "chatBody",
+        staticClass: "chatBody border-left border-right py-2"
+      },
       _vm._l(_vm.messages, function(message) {
         return _c("div", { key: message.id }, [
           _c(
             "div",
             {
               staticClass: "pt-3",
-              class: [_vm.userid != message.user_id ? "sender" : "reciever"]
+              class: [
+                _vm.authuser.id != message.user_id ? "sender" : "reciever"
+              ]
             },
             [
               _c(
                 "p",
                 {
                   class: [
-                    _vm.userid != message.user_id
+                    _vm.authuser.id != message.user_id
                       ? "senderText"
                       : "recieverText"
                   ]
                 },
                 [
+                  _c("small", { staticClass: "messageOwner" }, [
+                    _vm._v(_vm._s(message.user.name))
+                  ]),
                   _vm._v(
                     "\n                    " +
                       _vm._s(message.message) +
@@ -60162,9 +60182,9 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 window.Pusher = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/dist/web/pusher.js");
 window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
-  authEndpoint: "../broadcasting/auth",
+  // authEndpoint: "../broadcasting/auth",
   broadcaster: 'pusher',
-  key: "a440b3ba11dc1e767127",
+  key: "62cb0f17ea48af2df261",
   cluster: "ap1",
   encrypted: true
 });

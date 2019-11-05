@@ -25,6 +25,8 @@
     },
     "dependencies": {
         "laravel-echo": "^1.6.1",
-        "pusher-js": "^5.0.2"
+        "pusher-js": "^5.0.2",
+        "v-emoji-picker": "^1.2.6",
+        "vue-emoji-picker": "^1.0.1"
     }
 }

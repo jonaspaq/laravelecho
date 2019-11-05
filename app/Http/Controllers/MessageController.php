@@ -11,14 +11,13 @@ class MessageController extends Controller
 {
     public function send(Request $request)
     {
+        $completeDetails = $request->all();
         $request = $request->only('message_channel_id', 'user_id', 'message');
-        // $request['user_id'] = Auth::id();
-
+    
         $data = Message::create($request);
 
-        broadcast(new NewMessage($data))->toOthers();
+        broadcast(new NewMessage($completeDetails))->toOthers();
 
-        // $data = Message::with('user:id,name')->find($data)->first();
         return $data;
     }
 }

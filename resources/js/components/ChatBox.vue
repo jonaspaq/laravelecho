@@ -4,12 +4,12 @@
             <h3><img src="/images/Octocat.png"> Chat room for everyone</h3>
         </div>
 
-        <div class="chatBody border-left border-right py-2">
+        <div class="chatBody border-left border-right py-2" ref="chatBody">
             <div v-for="message in messages" :key="message.id">
 
-                <div :class="[(userid != message.user_id) ? 'sender' :'reciever']" class="pt-3">
-                    <p :class="[(userid != message.user_id) ? 'senderText' :'recieverText']">
-                        <!-- <small class="messageOwner">{{message.user.name}}</small> -->
+                <div :class="[(authuser.id != message.user_id) ? 'sender' :'reciever']" class="pt-3">
+                    <p :class="[(authuser.id != message.user_id) ? 'senderText' :'recieverText']">
+                        <small class="messageOwner">{{message.user.name}}</small>
                         {{message.message}} 
                     </p>
                 </div>
@@ -32,7 +32,7 @@ import axios from 'axios'
 
 export default {
     name:'ChatBox',
-    props: ['userid'],
+    props: ['authuser'],
 
     data(){
         return {
@@ -44,7 +44,6 @@ export default {
 
     created(){
         this.fetchMessages()
-        console.log(this.userid)
     },
 
     methods: {
@@ -54,24 +53,32 @@ export default {
             .then( response => {
                 this.messages = response.data
             })
+            .finally( e => {
+                this.$refs.chatBody.scrollTop = this.$refs.chatBody.scrollHeight
+            })
 
             window.Echo.channel('public')
             .listen('NewMessage', (e) => {
                 self.messages.push(e.message)
+
+                // Scroll down chat body when recieving new message
+                setTimeout(e => {this.$refs.chatBody.scrollTop = this.$refs.chatBody.scrollHeight}, 1)
             });
         },
         sendMessage(){
             const holder = {
-                user_id: this.userid,
+                user: this.authuser,
+                user_id: this.authuser.id,
                 message_channel_id: this.channelId,
                 message: this.inputMessage
             }
             this.messages.push(holder)
             this.inputMessage = ''
-            axios.post('/sendmessage', holder)       
-            .then( response => {
-            })         
-            
+
+            // Scroll down chat body when sending new message
+            setTimeout(e => {this.$refs.chatBody.scrollTop = this.$refs.chatBody.scrollHeight}, 1)
+
+            axios.post('/sendmessage', holder)           
         }
         
     }

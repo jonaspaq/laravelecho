@@ -2,6 +2,6 @@
 
 @section('content')
 <div class="container">
-    <Chat-Box :userid="{{ Auth::id() }}" />
+    <Chat-Box :authuser="{{ Auth::user() }}" />
 </div>
 @endsection

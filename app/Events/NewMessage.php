@@ -11,6 +11,8 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
+use Auth;
+
 class NewMessage implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
@@ -21,7 +23,7 @@ class NewMessage implements ShouldBroadcastNow
      * @return void
      */
 
-     public $message;
+    public $message;
 
     public function __construct($message)
     {
