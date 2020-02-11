@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\MessageChannel;
 
 class HomeController extends Controller
 {
@@ -23,6 +24,11 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $check = MessageChannel::where('id', '<>', 0)->first();
+
+        if(!$check)
+            factory(MessageChannel::class)->create();
+
         return view('chat');
     }
 }

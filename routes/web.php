@@ -24,6 +24,8 @@ Route::group(['middleware' => 'auth'], function(){
         return view('chat');
     });
 
+    Route::post('generate-channel', 'MessageChannelController@generateChannel');
+
     Route::post('/sendmessage', 'MessageController@send');
     Route::get('/getchannelmessages/{id}', 'MessageChannelController@getChannelMessages');
 
